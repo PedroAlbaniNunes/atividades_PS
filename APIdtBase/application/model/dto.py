@@ -14,6 +14,10 @@ class AtualizarPessoa(PessoaBase):
 
 class LerPessoa(PessoaBase):
     id: int
+    nome: str = Field(min_length=2, max_length=120)
+    dt_nasc: str = Field(min_length=8, max_length=8)
+    email: str = Field(min_length=10, max_length= 120)
+    enderecos: List[EnderecoBase]
 
 class CriarEndereco(EnderecoBase):
     endereco_id: Optional[int] = None
