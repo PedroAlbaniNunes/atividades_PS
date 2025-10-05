@@ -41,24 +41,33 @@ def create_crud_router(
             _hooks.pre_create(payload, session)
         return service.create(session, payload)
     
-    @router.get("/", response_model=list[read_schema])
+    @router.get("/{item_id}", response_model=list[read_schema])
     def get_item(item_id: int, session: Session = Depends(get_session)):
         obj = service.get(session, item_id)
         if not obj:
             raise HTTPException(404, "Não encontrado")
         return obj
     
+    @router.get("/", response_model=list[read_schema])
+    def get_list(
+        session: Session = Depends(get_session),
+        offset: int = 0,
+        limit: int = Query(100, le=page_size_limit),
+    ):
+        return service.list(session, offset, limit)
+    
+
     @router.patch("/{item_id}", response_model=read_schema)
     def update_item(item_id: int, payload: update_schema, session: Session = Depends(get_session)):
         obj = service.get(session, item_id)
         if not obj:
-            raise HTTPException(404, "Not found")
+            raise HTTPException(404, "Não encontrado")
         if hasattr(_hooks, "pre_update") and callable(_hooks.pre_update):
             _hooks.pre_update(payload, session, obj)
         try:
             return service.update(session, item_id, payload)
         except ValueError:
-            raise HTTPException(404, "Not found")
+            raise HTTPException(404, "Não encontrado")
     
     @router.delete("/{item_id}", status_code=204)
     def delete_item(item_id: int, session: Session = Depends(get_session)):

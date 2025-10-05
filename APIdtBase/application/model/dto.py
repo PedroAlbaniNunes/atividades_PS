@@ -8,25 +8,25 @@ class CriarPessoa(PessoaBase):
     pass
 
 class AtualizarPessoa(PessoaBase):
-    nome: str = Field(min_length=2, max_length=120)
-    dt_nasc: str = Field(min_length=8, max_length=8)
-    email: str = Field(min_length=10, max_length= 120)
+    nome: Optional[str] = Field(min_length=2, max_length=120)
+    dt_nasc: Optional[str] = Field(min_length=8, max_length=8)
+    email: Optional[str] = Field(min_length=10, max_length= 120)
 
 class LerPessoa(PessoaBase):
     id: int
-    nome: str = Field(min_length=2, max_length=120)
-    dt_nasc: str = Field(min_length=8, max_length=8)
-    email: str = Field(min_length=10, max_length= 120)
-    enderecos: List[EnderecoBase]
+
+class Pessoa_Endereco(LerPessoa):
+    enderecos: List["CriarEndereco"] = []
 
 class CriarEndereco(EnderecoBase):
-    endereco_id: Optional[int] = None
+    id_pessoa: int = Field(foreign_key="pessoa.id")
 
 class AtualizarEndereco(EnderecoBase):
-    logradouro: str = Field(min_length = 2, max_length = 200)
-    numero: str = Field(min_length = 1, max_length = 5)
-    estado: str = Field(min_length = 2, max_length = 2)
-    cidade: str = Field(min_length = 2, max_length = 120)
+    logradouro: Optional[str] = Field(min_length = 2, max_length = 200)
+    numero: Optional[str] = Field(min_length = 1, max_length = 5)
+    estado: Optional[str] = Field(min_length = 2, max_length = 2)
+    cidade: Optional[str] = Field(min_length = 2, max_length = 120)
+    id_pessoa: Optional[int] = None
 
 class LerEndereco(EnderecoBase):
     id: int

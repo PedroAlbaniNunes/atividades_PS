@@ -3,7 +3,8 @@ from util.database import init_db
 from controller.pessoa import router as pessoa_router
 from controller.endereco import router as endereco_router
 
-app = FastAPI(title="FastAAPI + Database + MVC + Repository")
+app = FastAPI(title="FastAPI+ dtBase + MVC + Repository",
+              version="1.1.0",)
 
 init_db()
 

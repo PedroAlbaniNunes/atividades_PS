@@ -5,20 +5,21 @@ from sqlmodel import SQLModel, Field, Relationship
 #------------------Pessoa-------------------
 class PessoaBase(SQLModel):
     nome: str = Field(min_length=2, max_length=120)
-    dt_nasc: str = Field(min_length=8, max_length=8)
-    email: str = Field(min_length=10, max_length= 120)
+    idade: Optional[int] = Field(default=None, ge=0, le=200)
+    email: Optional[str] = Field(max_length=120, unique=True)
 
-class Pessoa(SQLModel):
+class Pessoa(PessoaBase, table = True):
     id: Optional[int] = Field(default = None, primary_key = True, index = True)
-    endereco_id: List["Endereco"] = Relationship(back_populates = "id")
+    endereco_id: List["Endereco"] = Relationship(back_populates = "pessoa")
 
 #-------------------Endereço----------------
 class EnderecoBase(SQLModel):
-    logradouro: str = Field(min_length = 2, max_length = 200)
-    numero: str = Field(min_length = 1, max_length = 5)
-    estado: str = Field(min_length = 2, max_length = 2)
-    cidade: str = Field(min_length = 2, max_length = 120)
+    logradouro: Optional[str] = Field(min_length = 2, max_length = 200)
+    numero: Optional[str] = Field(min_length = 1, max_length = 5)
+    estado: Optional[str] = Field(min_length = 2, max_length = 2)
+    cidade: Optional[str] = Field(min_length = 2, max_length = 120)
 
-class Endereco(SQLModel):
+class Endereco(EnderecoBase, table = True):
     id: Optional[int] = Field(default = None, primary_key = True)
-    morador: List[Pessoa] = Relationship(back_populates = "id")    
+    id_pessoa: Optional[int] = Field(default=None, foreign_key="pessoa.id")
+    morador: Optional[Pessoa] = Relationship(back_populates = "enderecos")    
