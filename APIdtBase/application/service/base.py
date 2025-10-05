@@ -14,6 +14,8 @@ class Service(Generic[ModelT, CreateT, UpdateT]):
         return self.repo.list(session, offset, limit)
 
     def create(self, session: Session, data: CreateT) -> ModelT:
+        if data.nome not in data:
+            return self.repo.create(session, data)
         if "@" not in data.email:
             raise ValueError("Email inválido")
         existe = self.repo.get_by_email(session, data.email)

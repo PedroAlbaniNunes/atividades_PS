@@ -34,3 +34,42 @@ def create_crud_router(
     repo: Repository[ModelT, CreateT, UpdateT] = Repository(model)
     service: Service[ModelT, CreateT, UpdateT] = Service(repo)
     _hooks = hooks or Hooks()
+
+    @router.post("/", response_model=read_schema, status_code=201)
+    def create_item(payload: create_schema, session: Session = Depends(get_session)):
+        if hasattr(_hooks, "pre_create") and callable(_hooks.pre_create):
+            _hooks.pre_create(payload, session)
+        return service.create(session, payload)
+    
+    @router.get("/", response_model=list[read_schema])
+    def get_item(item_id: int, session: Session = Depends(get_session)):
+        obj = service.get(session, item_id)
+        if not obj:
+            raise HTTPException(404, "Não encontrado")
+        return obj
+    
+    @router.patch("/{item_id}", response_model=read_schema)
+    def update_item(item_id: int, payload: update_schema, session: Session = Depends(get_session)):
+        obj = service.get(session, item_id)
+        if not obj:
+            raise HTTPException(404, "Not found")
+        if hasattr(_hooks, "pre_update") and callable(_hooks.pre_update):
+            _hooks.pre_update(payload, session, obj)
+        try:
+            return service.update(session, item_id, payload)
+        except ValueError:
+            raise HTTPException(404, "Not found")
+    
+    @router.delete("/{item_id}", status_code=204)
+    def delete_item(item_id: int, session: Session = Depends(get_session)):
+        obj = service.get(session, item_id)
+        if not obj:
+            raise HTTPException(404, "Não encontrado")
+        if hasattr(_hooks, "pre_delete") and callable(_hooks.pre_delete):
+            _hooks.pre_delete(session, obj)
+        try:
+            service.delete(session, item_id)
+        except ValueError:
+            raise HTTPException(404, "Não encontrado")
+        
+    return router
