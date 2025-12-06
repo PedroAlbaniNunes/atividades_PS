@@ -10,7 +10,7 @@ class PessoaBase(SQLModel):
 
 class Pessoa(PessoaBase, table = True):
     id: Optional[int] = Field(default = None, primary_key = True, index = True)
-    endereco_id: List["Endereco"] = Relationship(back_populates = "pessoa")
+    enderecos: List["Endereco"] = Relationship(back_populates = "morador")
 
 #-------------------Endereço----------------
 class EnderecoBase(SQLModel):
@@ -22,4 +22,5 @@ class EnderecoBase(SQLModel):
 class Endereco(EnderecoBase, table = True):
     id: Optional[int] = Field(default = None, primary_key = True)
     id_pessoa: Optional[int] = Field(default=None, foreign_key="pessoa.id")
+
     morador: Optional[Pessoa] = Relationship(back_populates = "enderecos")    
